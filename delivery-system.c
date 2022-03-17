@@ -123,6 +123,7 @@ Query returns 0, since Adidas product has been removed from queue.*/
 
 #include <stdio.h>
 #include <stdlib.h>
+
 struct node
 {
     int prod_ID;
@@ -130,244 +131,120 @@ struct node
     char manufacturer[20];
     struct node *next;
 };
-struct node *insert(struct node *head, char labe[], char comp[], int id, int y, int z)
+
+int strcmp(char *a, char *b)
 {
-    struct node *new = (struct node *)malloc(sizeof(struct node));
-    new->prod_ID = id;
-    for (int g = 0; g < y; g++)
+    int id = 0;
+    while (a[id] != '\0' && b[id] != '\0')
     {
-        new->label[g] = labe[g];
+        if (a[id] != b[id])
+            return 0;
+        id++;
     }
-    for (int g = 0; g < z; g++)
+    if (a[id] == '\0' && b[id] == '\0')
+        return 1;
+    return 0;
+}
+
+int get_manufacturer_ID(char *manufacturer, char *partner_maufacturers[])
+{
+    for (int i = 0; i < 5; i++)
     {
-        new->manufacturer[g] = comp[g];
+        if (strcmp(manufacturer, partner_maufacturers[i]))
+            return i;
     }
-    if (head == NULL)
-    {
-        return new;
-    }
+    return -1;
+}
+
+struct node *Insert(struct node *head, char *partner_manufacturers[], int inside_queue[])
+{
+    struct node *curr = (struct node *)malloc(sizeof(struct node));
+    scanf("%d %s %s", &curr->prod_ID, curr->label, curr->manufacturer);
+    curr->next = NULL;
+    if (!head)
+        head = curr;
     else
     {
-        struct node *temp = head;
-        while (temp->next != NULL)
-        {
-            temp = temp->next;
-        }
-        temp->next = new;
-        new->next = NULL;
-        return head;
+        curr->next = head;
+        head = curr;
     }
+    printf("%d ADDED", curr->prod_ID);
+    inside_queue[get_manufacturer_ID(curr->manufacturer, partner_manufacturers)]++;
+    return curr;
 }
-struct node *delete (struct node *head)
+
+struct node *Print(struct node *head, char *partner_manufacturers[], int inside_queue[], int delivered[])
 {
-    head = head->next;
+    struct node *curr = head;
+    struct node *prev = NULL;
+    if (!curr)
+    {
+        printf("NOTHING TO DELIVER NOW");
+        return NULL;
+    }
+    while (curr->next)
+    {
+        prev = curr;
+        curr = curr->next;
+    }
+    int manufacturer_ID = get_manufacturer_ID(curr->manufacturer, partner_manufacturers);
+    inside_queue[manufacturer_ID]--;
+    delivered[manufacturer_ID]++;
+    printf("%d %s %s", curr->prod_ID, curr->label, curr->manufacturer);
+    if (!prev)
+    {
+        free(curr);
+        return NULL;
+    }
+    prev->next = NULL;
+    free(curr);
     return head;
 }
-int coun(struct node *head, char w)
+
+void Query(int a[], char *partner_maufacturers[])
 {
-    int count = 0;
-    struct node *temp = head;
-    while (temp != NULL)
+    char manufacturer[20];
+    scanf("%s", manufacturer);
+    int ID = get_manufacturer_ID(manufacturer, partner_maufacturers);
+    if (ID == -1)
     {
-        if (temp->manufacturer[0] == w)
-        {
-            count++;
-        }
-        temp = temp->next;
+        printf("-1");
+        return;
     }
-    return count;
+    printf("%d", a[ID]);
 }
+
 int main()
 {
-    //  Insert your code here.
-    int type;
-    int id;
-    char labe[100];
-    char comp[20];
     int n;
-    int brr[5];
     scanf("%d", &n);
     struct node *head = NULL;
+    char *partner_manufacturers[] = {"Nike", "Adidas", "Reebok", "Puma", "Diadora"};
+    int inside_queue[5] = {0};
+    int delivered[5] = {0};
     for (int i = 0; i < n; i++)
     {
-        scanf("%d ", &type);
-        if (type == 1)
-        {
-            scanf("%d ", &id);
-            int y = 0;
-            char dummy;
-            scanf("%c", &dummy);
-            while (dummy != ' ')
-            {
-                labe[y] = dummy;
-                y++;
-                scanf("%c", &dummy);
-            }
-            int z;
-            if (i == n - 1)
-            {
-                scanf("%c", &dummy);
-                if (dummy == 'N')
-                {
-                    char com[4] = {'N', 'I', 'K', 'E'};
-                    z = 4;
-                    head = insert(head, labe, com, id, y, z);
-                }
-                else if (dummy == 'A')
-                {
-                    z = 6;
-                    char com[6] = {'A', 'D', 'I', 'D', 'A', 'S'};
-                    head = insert(head, labe, com, id, y, z);
-                }
-                else if (dummy == 'R')
-                {
-                    z = 6;
-                    char com[6] = {'R', 'E', 'E', 'B', 'O', 'K'};
-                    head = insert(head, labe, com, id, y, z);
-                }
-                else if (dummy == 'P')
-                {
-                    z = 4;
-                    char com[4] = {'P', 'U', 'M', 'A'};
-                    head = insert(head, labe, com, id, y, z);
-                }
-                else if (dummy == 'D')
-                {
-                    z = 7;
-                    char com[7] = {'D', 'I', 'A', 'D', 'O', 'R', 'A'};
-                    head = insert(head, labe, com, id, y, z);
-                }
-            }
-            else
-            {
-                z = 0;
-                scanf("%c", &dummy);
-                while (dummy != '\n')
-                {
-                    comp[z] = dummy;
-                    z++;
-                    scanf("%c", &dummy);
-                }
-                head = insert(head, labe, comp, id, y, z);
-            }
-            printf("%d ADDED", id);
-        }
-        else if (type == 2)
-        {
-            if (head == NULL)
-            {
-                printf("NOTHING TO DELIVER NOW");
-            }
-            else
-            {
-                if (head->manufacturer[0] == 'N')
-                {
-                    brr[0]++;
-                }
-                else if (head->manufacturer[0] == 'A')
-                {
-                    brr[1]++;
-                }
-                else if (head->manufacturer[0] == 'R')
-                {
-                    brr[2]++;
-                }
-                else if (head->manufacturer[0] == 'P')
-                {
-                    brr[3]++;
-                }
-                else if (head->manufacturer[0] == 'D')
-                {
-                    brr[4]++;
-                }
-                printf("%d %s %s", head->prod_ID, head->label, head->manufacturer);
-
-                head = delete (head);
-            }
-        }
-        else if (type == 3)
-        {
-            char dummy;
-            int y = 0;
-            scanf("%c", &dummy);
-            if (i == n - 1)
-            {
-                /* while(dummy != EOF)
-             {
-                 comp[y] = dummy;
-                 y++;
-                 scanf("%c" , &dummy);
-             }*/
-                comp[0] = dummy;
-            }
-            else
-            {
-                while (dummy != '\n')
-                {
-                    comp[y] = dummy;
-                    y++;
-                    scanf("%c", &dummy);
-                }
-            }
-            if (!(comp[0] == 'N' || comp[0] == 'A' || comp[0] == 'R' || comp[0] == 'P' || comp[0] == 'D'))
-            {
-                printf("-1");
-            }
-            else
-            {
-                printf("%d", coun(head, comp[0]));
-            }
-        }
-        else if (type == 4)
-        {
-            char dummy;
-            int y = 0;
-            scanf("%c", &dummy);
-            if (i == n - 1)
-            {
-                /*while(dummy != EOF)
-            {
-                comp[y] = dummy;
-                y++;
-                scanf("%c" , &dummy);
-            }*/
-                comp[0] = dummy;
-            }
-            else
-            {
-                while (dummy != '\n')
-                {
-                    comp[y] = dummy;
-                    y++;
-                    scanf("%c", &dummy);
-                }
-            }
-            if (comp[0] == 'N')
-            {
-                printf("%d", brr[0]);
-            }
-            else if (comp[0] == 'A')
-            {
-                printf("%d", brr[1]);
-            }
-            else if (comp[0] == 'R')
-            {
-                printf("%d", brr[2]);
-            }
-            else if (comp[0] == 'P')
-            {
-                printf("%d", brr[3]);
-            }
-            else if (comp[0] == 'D')
-            {
-                printf("%d", brr[4]);
-            }
-            else
-            {
-                printf("-1");
-            }
-        }
-        printf("\n");
+        int typ;
+        scanf("%d", &typ);
+        if (typ == 1)
+            head = Insert(head, partner_manufacturers, inside_queue);
+        else if (typ == 2)
+            head = Print(head, partner_manufacturers, inside_queue, delivered);
+        else if (typ == 3)
+            Query(inside_queue, partner_manufacturers);
+        else if (typ == 4)
+            Query(delivered, partner_manufacturers);
+        if (i < n - 1)
+            printf("\n");
+        struct node *curr = head;
     }
+    struct node *tmp;
+    while (head)
+    {
+        tmp = head;
+        head = head->next;
+        free(tmp);
+    }
+
     return 0;
 }

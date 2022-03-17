@@ -99,134 +99,85 @@ The valid sequences are:
 // solution:
 
 #include <stdio.h>
-#include <stdlib.h>
-int spanner(char b, char str[])
+
+float get_score(char word[], char target[])
 {
-    int flag = -9;
+    char wd[5], tg[5];
     for (int i = 0; i < 5; i++)
     {
-        if (str[i] == b)
-        {
-            flag = i;
-            break;
-        }
+        wd[i] = word[i];
+        tg[i] = target[i];
     }
-    return flag;
-}
-float score(char str[], char word[])
-{
-    float green = 0;
-    float yellow = 0;
-    int temp[5];
+    float score = 0;
     for (int i = 0; i < 5; i++)
     {
-        temp[i] = 0;
+        if (wd[i] == tg[i])
+        {
+            score += 2;
+            wd[i] = '*'; // marking
+            tg[i] = '#'; // marking
+        }
     }
-    float grey = 0;
     for (int i = 0; i < 5; i++)
     {
-        int c = spanner(str[i], word);
-        if (str[i] == word[i])
+        for (int j = 0; j < 5; j++)
         {
-            green = green + 1;
-            temp[i]++;
+            if (wd[i] == tg[j])
+            {
+                score += 1;
+                wd[i] = '*'; // marking
+                tg[j] = '#'; // marking
+                break;
+            }
         }
-        else if (c == -9)
+    }
+    for (int i = 0; i < 5; i++)
+    {
+        if (wd[i] != '*')
         {
-            grey = grey + 1;
+            score -= 0.05;
         }
     }
-    yellow = 5 - green - grey;
-    float ans = 2 * green + yellow - 0.05 * grey;
-    // printf("score\n");
-    return ans;
+    return score;
 }
-int mini(int a, int b)
+
+int get_sqns(char words[][6], int n, int k, float curr_score, int num)
 {
-    if (a < b)
+    if (num > 6)
     {
-        return a;
+        return 0;
     }
-    else
-    {
-        return b;
-    }
-}
-int checkvalid(char **ans, int x, char word[])
-{
-    if (x == 1)
-    {
+    if (curr_score == 10)
         return 1;
-    }
-    for (int i = 0; i < x - 1; i++)
-    {
-        if (score(ans[i], word) >= score(ans[i + 1], word))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-void func(char **ans, int n, char **mat, int x, int k, int *count, int i, int istart)
-{
-    if (i == x)
-    {
-        if (checkvalid(ans, x, mat[k - 1]))
-        {
-            *count = *count + 1;
-        }
-        return;
-    }
-    if (i > x)
-    {
-        return;
-    }
-    for (int j = 0; j < n; j++)
-    {
-        if (j == k - 1)
-        {
-            continue;
-        }
-        istart = j;
-        for (int f = 0; f < 5; f++)
-        {
-            ans[i][f] = mat[istart][f];
-        }
-        func(ans, n, mat, x, k, count, i + 1, istart);
-    }
-}
-int main()
-{
-    //  Insert your code here.
-    int n;
-    int k;
-    scanf("%d %d\n", &n, &k);
-    char **mat;
-    mat = (char **)malloc(n * sizeof(char *));
-    char **ans;
-    int x = mini(n, 6);
-    ans = (char **)malloc(x * sizeof(char *));
-    for (int i = 0; i < x; i++)
-    {
-        ans[i] = (char *)malloc(5 * sizeof(char));
-    }
+    int ans = 0;
     for (int i = 0; i < n; i++)
     {
-        mat[i] = (char *)malloc(5 * sizeof(char));
-        scanf("%s", mat[i]);
-        // printf("%s\n" , mat[i]);
+        char curr[6];
+        for (int j = 0; j < 6; j++)
+        {
+            curr[j] = words[i][j];
+        }
+        if (get_score(curr, words[k]) > curr_score)
+            ans += get_sqns(words, n, k, get_score(curr, words[k]), num + 1);
     }
-    /*for(int i=0;i<n;i++)
+    return ans;
+}
+
+int main()
+{
+    int n, k;
+    scanf("%d  %d", &n, &k);
+    k--;
+    char words[n][6];
+    for (int i = 0; i < n; i++)
     {
-        printf("%f\n" , score(mat[i] , mat[k-1]));
-    }*/
-    // printf("%f" , score(mat[k-1] , mat[1]));
-    // printf("%d" , checkvalid(mat,x-1,mat[k-1]));
-    int count = 1;
-    for (int h = 1; h < x; h++)
-    {
-        func(ans, n, mat, h, k, &count, 0, 0);
+        char inp[6];
+        scanf("%s", inp);
+        inp[5] = '\0';
+        for (int j = 0; j < 6; j++)
+            words[i][j] = inp[j];
     }
-    printf("%d", count);
+
+    printf("%d\n", get_sqns(words, n, k, -10, 0));
     return 0;
 }

@@ -205,59 +205,17 @@ void print_stack(struct Stack *s)
 
 void add_book(struct Stack *s, struct Book b)
 {
-    struct Book *new;
-    if (s->current_shelf_capacity - 1 == s->num_books)
-    {
-        new = (struct Book *)malloc((s->current_shelf_capacity * 2) * sizeof(struct Book));
-        s->current_shelf_capacity *= 2;
-    }
-    else
-    {
-        new = (struct Book *)malloc((s->num_books + 1) * sizeof(struct Book));
-    }
-    for (int i = 0; i < s->num_books; i++)
-    {
-        *(new + i) = s->books[i];
-    }
-    *(new + s->num_books) = b;
-    s->books = new;
+    
 }
 // adds a book to the stack of books, and updates the stack structure accordingly.
 void remove_book(struct Stack *s)
 {
-    // struct Book *new = (struct Book*)malloc((num_books-1)*sizeof(struct Book));
-    struct Book *new;
-    if (s->num_books - 1 < s->current_shelf_capacity / 2)
-    {
-        new = (struct Book *)malloc((s->current_shelf_capacity / 2) * sizeof(struct Book));
-        s->current_shelf_capacity /= 2;
-    }
-    else
-    {
-        new = (struct Book *)malloc((s->num_books - 1) * sizeof(struct Book));
-    }
-    for (int i = 0; i < s->num_books - 1; i++)
-    {
-        *(new + i) = s->books[i];
-    }
-    s->books = new;
-    return;
+    
 }
 // removes a book from the stack of books, and updates the stack structure accordingly.
 struct Book get_most_recent_book(struct Stack *s)
 {
-    if (s == NULL)
-    {
-        struct Book ans; //= (struct Book*)malloc(sizeof(struct Book));
-        ans.name[0] = 'N';
-        ans.name[1] = 'A';
-        ans.author[0] = 'N';
-        ans.author[1] = 'A';
-        return ans;
-    }
-    struct Book ans;
-    ans = *(s->books + s->num_books - 1);
-    return ans;
+    
 }
 // gets the book which was added most recently, but does not delete it from the stack
 void destroy_stack(struct Stack *s)

@@ -135,24 +135,9 @@ int getrow(char **op, char x)
     }
     return row;
 }
-int getcol(char **op, int row, char x)
-{
-    for (int j = 0; j < 3; j++)
-    {
-        if (op[row][j] == x)
-        {
-            return j;
-        }
-    }
-}
-void swap(char str[5], int i, int j)
-{
-    char t = str[j];
-    str[j] = str[i];
-    str[i] = t;
-}
 int main()
 {
+
     char **op;
     op = (char **)malloc(5 * sizeof(char *));
     for (int i = 0; i < 5; i++)
@@ -170,47 +155,31 @@ int main()
     op[4][0] = '&';
     op[4][1] = '|';
     op[4][2] = '^';
+    char mat[5][5];
     int t;
+    int count[5];
     scanf("%d\n", &t);
-    char str[5];
     char ch;
     for (int g = 0; g < t; g++)
     {
-        int n = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            count[i] = 0;
+        }
         scanf("%c", &ch);
         while (ch != '\n')
         {
-            str[n] = ch;
-            n++;
+            int x = getrow(op, ch);
+            // printf("%d " , x);
+            mat[x][count[x]] = ch;
+            count[x]++;
             scanf("%c", &ch);
         }
-        /*for(int u=0;u<n;u++)
+        for (int i = 0; i < 5; i++)
         {
-            printf("%c" , str[u]);
-        }*/
-        for (int i = n - 1; i > 0; i--)
-        {
-            /*for(int j=i+1;j<n;j++)
-            {*/
-            if (getrow(op, str[i]) < getrow(op, str[i - 1]))
+            for (int j = 0; j < count[i]; j++)
             {
-                swap(str, i, i - 1);
-            }
-            else if (getrow(op, str[i]) == getrow(op, str[i - 1]) && getrow(op, str[i]) == 4)
-            {
-                if (getcol(op, 4, str[i]) < getcol(op, 4, str[i - 1]))
-                {
-                    swap(str, i, i - 1);
-                }
-            }
-            // }
-        }
-        for (int u = 0; u < n; u++)
-        {
-            printf("%c", str[u]);
-            if (u < n)
-            {
-                printf(" ");
+                printf("%c ", mat[i][j]);
             }
         }
         if (g < t - 1)
@@ -218,5 +187,6 @@ int main()
             printf("\n");
         }
     }
+
     return 0;
 }
